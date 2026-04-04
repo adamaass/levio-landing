@@ -1,0 +1,8 @@
+{
+  "name": "levio-landing",
+  "version": "1.0.0",
+  "description": "Landing page Levio - alarme mission",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
