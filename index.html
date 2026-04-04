@@ -252,7 +252,7 @@ footer a{color:#8B5CF6;text-decoration:none}
     <div class="hero-badge"><span class="dot"></span> Bêta privée — places limitées</div>
     <h1>Arrête de <span class="gold">négocier</span> avec ton réveil.<br>Commence à <span class="gold">gagner</span> tes matins.</h1>
     <p class="hero-sub">Levio est l'alarme qui ne s'arrête que quand tu accomplis ta mission. Pompes, maths, photo — tu choisis le défi.</p>
-    <form class="hero-form" action="#" method="POST" onsubmit="event.preventDefault();document.getElementById('preorder').scrollIntoView({behavior:'smooth'})">
+    <form class="hero-form">
       <input type="email" placeholder="ton@email.com" required>
       <button type="submit">Réserver ma place</button>
     </form>
@@ -414,7 +414,7 @@ footer a{color:#8B5CF6;text-decoration:none}
   <p class="preorder-sub">Les 500 premiers early adopters bénéficient du prix fondateur — à vie.</p>
   <div class="urgency"><span class="dot"></span> 127 places restantes sur 500</div>
   <div class="price-box"><div class="price-old">9,99$ / mois</div><div class="price-new"><em>5$</em> une fois</div><div class="price-label">Accès à vie • Prix fondateur</div></div>
-  <form class="preorder-form" action="#" method="POST" onsubmit="event.preventDefault()"><input type="email" placeholder="ton@email.com" required><button type="submit">Précommander — 5$</button></form>
+  <form class="preorder-form"><input type="email" placeholder="ton@email.com" required><button type="submit">Précommander — 5$</button></form>
   <p class="preorder-micro">→ Email puis paiement sécurisé Stripe.</p>
   <div class="perks">
     <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg> Accès bêta immédiat</div>
@@ -432,15 +432,75 @@ footer a{color:#8B5CF6;text-decoration:none}
 
 <footer><div class="container"><p>© 2026 Levio. Fait avec discipline. <a href="#">Conditions</a> · <a href="#">Confidentialité</a></p></div></footer>
 
-<script>
-const nav=document.getElementById('nav');
-window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>40)});
-const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target)}})},{threshold:.15});
-document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
-</script>
-
 <!-- Analytics -->
 <!-- TODO: Ajouter Meta Pixel + GA4 ici -->
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+const obs = new IntersectionObserver(e => {
+  e.forEach(el => {
+    if (el.isIntersecting) {
+      el.target.classList.add('visible');
+      obs.unobserve(el.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+const TALLY_FORM_ID = 'PdYPA5';
+const STRIPE_LINK = 'https://buy.stripe.com/14A6oH9584gBdfNdykeQM0c';
+
+function sendToTallyAndStripe(email) {
+  var iframe = document.createElement('iframe');
+  iframe.name = 'tally-hidden-' + Date.now();
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://tally.so/r/' + TALLY_FORM_ID;
+  form.target = iframe.name;
+  form.style.display = 'none';
+
+  var input = document.createElement('input');
+  input.type = 'email';
+  input.name = 'email';
+  input.value = email;
+  form.appendChild(input);
+
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(function() {
+    window.location.href = STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(email);
+  }, 600);
+
+  setTimeout(function() {
+    iframe.remove();
+    form.remove();
+  }, 5000);
+}
+
+document.querySelectorAll('form').forEach(function(f) {
+  f.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var emailInput = this.querySelector('input[type="email"]');
+    if (emailInput && emailInput.value) {
+      var btn = this.querySelector('button[type="submit"]');
+      if (btn) {
+        btn.textContent = 'Redirection...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+      }
+      sendToTallyAndStripe(emailInput.value);
+    }
+  });
+});
+</script>
 
 </body>
 </html>
