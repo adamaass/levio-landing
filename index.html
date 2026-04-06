@@ -459,6 +459,20 @@ const obs = new IntersectionObserver(e => {
 }, { threshold: 0.15 });
 document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
+// ====== TIKTOK PIXEL EVENTS ======
+// ViewContent — quand la page charge
+ttq.track('ViewContent', {
+  contents: [
+    {
+      content_id: "levio_early_access",
+      content_type: "product",
+      content_name: "Levio Early Access"
+    }
+  ],
+  value: 5,
+  currency: "USD"
+});
+
 const TALLY_FORM_ID = 'PdYPA5';
 const TALLY_EMAIL_FIELD = '56329e19-f701-417f-bc81-7ab49533ceb5';
 const STRIPE_LINK = 'https://buy.stripe.com/14A6oH9584gBdfNdykeQM0c';
@@ -472,6 +486,16 @@ function generateUUID() {
 }
 
 function sendToTallyAndStripe(email) {
+  ttq.identify({ email: email });
+  ttq.track('CompleteRegistration', {
+    contents: [{ content_id: "levio_early_access", content_type: "product", content_name: "Levio Early Access" }],
+    value: 5, currency: "USD"
+  });
+  ttq.track('InitiateCheckout', {
+    contents: [{ content_id: "levio_early_access", content_type: "product", content_name: "Levio Early Access" }],
+    value: 5, currency: "USD"
+  });
+
   fetch('https://api.tally.so/forms/' + TALLY_FORM_ID + '/respond', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
